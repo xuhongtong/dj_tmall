@@ -1,0 +1,29 @@
+<ul>
+    <p>商品分类</p>
+    {% for cate in cate_list %}
+        <li class="cate">{{ cate.name }}</li>
+        <ul>
+            {% for sub in cate.sub_list %}
+            <li class="subcate">{{ sub.name }}</li>
+                <ul class="sub2">
+                    {% for sub in sub_list  %}
+                        {% for sub2 in sub.sub2_list %}
+                            <li>{{ sub2.name }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</ul>
+<ul>
+    {% for cate in cate_list %}
+        <li>{{ cate.name }}</li>
+        <ul>
+            {% for shop in cate.shop_list %}
+                <li><a href="{% url 'detail' %}?shop_id={{ shop.shop_id }}">{{ shop.name }}</a></li>
+        {% endfor %}
+        </ul>
+
+    {% endfor %}
+</ul>

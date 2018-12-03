@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+{% block title %}购物车{% endblock %}
+{% block page_jq %}
+    <script>
+        $(function () {
+            {#减少数量按钮点击事件#}
+            $('.reduce').click(function () {
+                {#获取当前点击标签的下一个兄弟元素值#}
+                let num = parseInt($(this).next().val());
+                if (num > 1) {
+                    num--;
+                    $(this).next().val(num);
+                    {#获取单价#}
+                    $money=$(this).parent().prev().text();
+                    $total=parseInt($money)*num;
+                    $(this).parent().next().text($total);
+                }
+            });
+            {#增加数量按钮点击事件#}
+            $('.add').click(function () {
+                let num = parseInt($(this).prev().val());
+                num++;
+                $(this).prev().val(num);
+                {#获取单价#}
+                $money=$(this).parent().prev().text();
+                {#$total=parseInt($money)*num;#}
+                {#计算结果保留2位小数#}
+                $total=parseFloat(($money)*num).toFixed(2);
+                {#获取总额#}
+                $(this).parent().next().text($total);
+            });
+
+            {#移除商品按钮点击事件#}
+            $('.remove').click(function () {
+                let del = confirm('确认删除?');
+                if (del === true) {
+                    $(this).parent().parent().remove();
+                    {#获取当前点击标签的属性值，这里是自定义的，用于传递给后台做查询操作#}
+                    let car_id = $(this).attr('car_id');
+                    {#发送的请求数据，需要传递给后台做查询操作的数据#}
+                    data = {
+                        'car_id': car_id,
+                    };
+                    {#发送ajax请求到服务器#}
+                    $.get('{% url 'delcart' %}', data, function (result) {
+                        if (result && result.status === 200) {
+                        } else if (result.status === 302) {
+                            window.location.href = result.content
+                        }
+                    })
+                }
+            })
+        })
+    </script>
+{% endblock %}
+{% block page_main %}
+    <table>
+        <tr>
+            <th><input type="checkbox">全选</th>
+            <th>商品信息</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>金额</th>
+            <th>操作</th>
+        </tr>
+        {% for shop_cart in shop_carts %}
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>{{ shop_cart.shop.name }}</td>
+                <td>{{ shop_cart.shop.promote_price }}</td>
+                <td>
+                    <button class="reduce">-</button>
+                    <input type="text" value='{{ shop_cart.number }}'>
+                    <button class="add">+</button>
+                </td>
+                <td>{{ shop_cart.shop.promote_price }}</td>
+                <td>
+                    <button class="remove" type="button" car_id={{ shop_cart.car_id }}>删除</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

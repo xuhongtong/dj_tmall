@@ -1,0 +1,32 @@
+
+/*搜索栏*/
+.search{
+    margin-top: 40px;
+}
+.search_text{
+    height: 50px;
+}
+
+.search_btn{
+    height: 50px;
+    width: 80px;
+}
+
+/*导航*/
+.navgation{
+    margin-left: 300px;
+}
+
+
+/*分类*/
+.cate{
+    color: red;
+}
+
+.subcate{
+    color: #5cb85c;
+}
+
+.sub2{
+    color: gold;
+}

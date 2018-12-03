@@ -1,0 +1,75 @@
+{% extends 'base/base.html' %}
+{% block title %}详情页{% endblock %}
+{% block page_jq %}
+    <script type="text/javascript">
+        $(function () {
+            {#加入购物车点击事件#}
+            $('#buy').click(function () {
+                let number = $('#number').val();
+                let shop_id = $(this).attr('shopid');
+                data = {
+                    number: number,
+                    shop_id: shop_id,
+                    {#获取页面生成的中间件#}
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                };
+                {#发送ajax请求，每次加入购物车就发送请求给后台，然后局部刷新购物车动态变化数量#}
+                $.post('{% url 'add_cart' %}', data, function (result) {
+                    if (result && result.status === 200) {
+                        {#let number = $('.car_number').text();#}
+                        {#number += result.data;#}
+                        {#接收后台数据后进行dom操作，也就是给购物车动态修改数量，#}
+                        {#定位购物车标签元素，将后端数据库查询的购物车商品数量赋值#}
+                        {#方法有2种#}
+                        {#1.模板传递参数方式#}
+                        {#2.ajax的dom动态添加文本内容操作#}
+                        $('.car_number').text(result.data);
+                        {#$('.car_number').text(number);#}
+                    } else if (result.status === 302) {
+                        window.location.href = result.content
+                    }
+                })
+            })
+        })
+
+    </script>
+{% endblock %}
+
+{% block page_main %}
+    <div>
+        <ul>
+            {% for img in imgs %}
+                <li><img src="/static/img/middle/{{ img.shop_img_id }}.jpg" alt=""></li>
+                <li><img src="/static/img/small/{{ img.shop_img_id }}.jpg" alt=""></li>
+            {% endfor %}
+        </ul>
+        <div>
+            <p>{{ shop.name }}</p>
+            <p>{{ shop.sub_title }}</p>
+            <p>价格{{ shop.original_price }}</p>
+            <p>促销价{{ shop.promote_price }}</p>
+        </div>
+{#    生成中间件#}
+    {% csrf_token %}
+        <input id='number' name=number type="number" value="1" min="1"
+               max="{{ shop.stock }}"><span>{{ shop.stock }}</span>
+        <div>
+            <button type="button">立即购买</button>
+            <button type="button" id="buy" shopid="{{ shop.shop_id }}">加入购物车</button>
+        </div>
+        <ul>
+            {% for value in value_list %}
+                <span>{{ value.property.name }}</span>
+                <span>:{{ value.value }}</span>
+                <br>
+            {% endfor %}
+        </ul>
+        <ul>
+            {% for review in reviews %}
+                <li>{{ review.content }}</li>
+                <li>{{ review.create_date|date:'Y-m-d' }}</li>
+                <li>{{ review.user.user.username }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
